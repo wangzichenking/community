@@ -34,4 +34,9 @@ public interface CommunityConstant {
     实体类型：评论
      */
     int ENTITY_TYPE_COMMENT = 2;
+
+    /*
+    实体类型：评论
+     */
+    int ENTITY_TYPE_USER = 3;
 }
