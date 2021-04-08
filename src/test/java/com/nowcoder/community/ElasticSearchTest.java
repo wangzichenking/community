@@ -3,8 +3,6 @@ package com.nowcoder.community;
 import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.elasticsearch.DiscussPostRepository;
 import com.nowcoder.community.entity.DiscussPost;
-import org.elasticsearch.Build;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -13,14 +11,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -89,12 +91,19 @@ public class ElasticSearchTest {
                         new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
                         new HighlightBuilder.Field("content").preTags("<em>").postTags("</em>")
                 ).build();
-        Page<DiscussPost> page = discussPostRepository.search(query);
-        System.out.println(page.getTotalElements());
-        System.out.println(page.getTotalPages());
-        System.out.println(page.getNumber());
-        System.out.println(page.getSize());
-        for (DiscussPost discussPost : page) {
+        SearchHits<DiscussPost> search = template.search(query,DiscussPost.class);
+        List<SearchHit<DiscussPost>> searchHits = search.getSearchHits();
+        List<DiscussPost> discussPosts = new ArrayList<>();
+        for (SearchHit<DiscussPost> searchHit : searchHits) {
+            Map<String,List<String>> highLightFields = searchHit.getHighlightFields();
+            searchHit.getContent().setTitle(
+                    highLightFields.get("title") == null ? searchHit.getContent().getTitle() : highLightFields.get("title").get(0));
+            searchHit.getContent().setTitle(
+                    highLightFields.get("content") == null ? searchHit.getContent().getContent() : highLightFields.get("content").get(0));
+            discussPosts.add(searchHit.getContent());
+        }
+        System.out.println(discussPosts.size());
+        for (DiscussPost discussPost : discussPosts) {
             System.out.println(discussPost);
         }
     }
