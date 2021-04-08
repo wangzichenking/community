@@ -7,6 +7,7 @@ import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class SearchController implements CommunityConstant {
 
     @Autowired
-    private ElasticSearchService elasticSearchService;
+    private ElasticSearchService elasticsearchService;
 
     @Autowired
     private UserService userService;
@@ -29,31 +30,32 @@ public class SearchController implements CommunityConstant {
     @Autowired
     private LikeService likeService;
 
-    //search?keyword=?
-    @RequestMapping(value = "/search",method = RequestMethod.GET)
-    public String search(String keyword, Page page, Model model){
-        //搜索帖子
-        List<Object> list = elasticSearchService.searchDiscussPost(keyword,page.getCurrent()-1,page.getLimit());
-        //聚合数据
+    // /search?keyword=
+    @RequestMapping(path = "/search", method = RequestMethod.GET)
+    public String search(String keyword, Page page , Model model){
+        // 查找帖子
+        List<Object> list = elasticsearchService.searchDiscussPost(keyword, page.getCurrent() -1, page.getLimit());
+
+        // 聚合数据
         List<DiscussPost> tempPosts = (List<DiscussPost>) list.get(1);
         List<Map<String, Object>> discussPosts = new ArrayList<>();
-        if (tempPosts.size() > 0){
-            for (DiscussPost post : tempPosts) {
+        if(tempPosts.size() > 0){
+            for(DiscussPost post : tempPosts){
                 Map<String, Object> map = new HashMap<>();
-                //帖子
-                map.put("post",post);
-                //作者
-                map.put("user",userService.findUserById(post.getUserId()));
-                //点赞数量
-                map.put("likeCount",likeService.findEntityLikeCount(ENTITY_TYPE_POST,post.getId()));
+                // 帖子
+                map.put("post", post);
+                // 作者
+                map.put("user", userService.findUserById(post.getUserId()));
+                // 点赞数量
+                map.put("likeCount", likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId()));
                 discussPosts.add(map);
             }
         }
-        model.addAttribute("discussPosts",discussPosts);
-        model.addAttribute("keyword",keyword);
+        model.addAttribute("discussPosts", discussPosts);
+        model.addAttribute("keyword", keyword);
 
-        //分页
-        page.setPath("/search?keyword="+keyword);
+        // 设置分页信息
+        page.setPath("/search?keyword=" + keyword);
         page.setRows(list.get(0) == null ? 0 : (int)list.get(0));
         return "/site/search";
     }
