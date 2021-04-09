@@ -156,4 +156,70 @@ public class DiscussPostController implements CommunityConstant {
         model.addAttribute("comments",commentVoList);
         return "/site/discuss-detail";
     }
+
+    /*
+    置顶请求
+     */
+    @RequestMapping(value = "/top",method = RequestMethod.POST)
+    @ResponseBody
+    public String setTop(int id){
+        /*
+        普通帖子：0    置顶帖子：1
+         */
+        discussPostService.updateType(id,1);
+        /*
+        触发发帖事件
+         */
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(id);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJSONString(0);
+    }
+
+    /*
+    加精请求
+     */
+    @RequestMapping(value = "/wonderful",method = RequestMethod.POST)
+    @ResponseBody
+    public String setWonderful(int id){
+        /*
+        普通：0    加精：1    拉黑：2
+         */
+        discussPostService.updateStatus(id,1);
+        /*
+        触发发帖事件
+         */
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(id);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJSONString(0);
+    }
+
+    /*
+    删除请求
+     */
+    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    @ResponseBody
+    public String setDelete(int id){
+        /*
+        普通：0    加精：1    拉黑：2
+         */
+        discussPostService.updateStatus(id,2);
+        /*
+        触发删帖事件
+         */
+        Event event = new Event()
+                .setTopic(TOPIC_DELETE)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(id);
+        eventProducer.fireEvent(event);
+        return CommunityUtil.getJSONString(0);
+    }
 }
