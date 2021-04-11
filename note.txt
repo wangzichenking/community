@@ -19,3 +19,13 @@ ElasticSearch
 - 术语
     - 索引，类型，文档，字段
     - 集群，节点，分片，副本
+
+网站数据统计
+- UV（Unique Visitor）
+  - 独立访客，需要通过用户IP排重统计数据
+  - 每次访问都要进行统计
+  - HyperLogLog，性能好，且存储空间小
+- DAU（Daily Active User）
+  - 日活跃用户，需要通过用户ID排重统计数据
+  - 访问过一次，则认为其活跃
+  - Bitmaps，性能好，且可以准确统计结果
