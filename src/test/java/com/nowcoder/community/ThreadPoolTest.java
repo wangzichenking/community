@@ -122,13 +122,13 @@ public class ThreadPoolTest {
     /*
     Spring普通线程池简化版
      */
-    @Test
-    public void testThreadPoolTaskExecutorSimple(){
-        for (int i = 0; i < 10; i++) {
-            alphaService.executor1();
-        }
-        sleep(10000);
-    }
+//    @Test
+//    public void testThreadPoolTaskExecutorSimple(){
+//        for (int i = 0; i < 10; i++) {
+//            alphaService.executor1();
+//        }
+//        sleep(10000);
+//    }
 
     /*
     Spring定时任务线程池简化版

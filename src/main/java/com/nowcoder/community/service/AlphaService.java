@@ -43,17 +43,17 @@ public class AlphaService {
     /*
     @Async：让该方法在多线程环境下，被异步的调用
      */
-    @Async
-    public void executor1(){
-        LOGGER.debug("executor1");
-    }
+//    @Async
+//    public void executor1(){
+//        LOGGER.debug("executor1");
+//    }
 
     /*
     @Scheduled：让该方法定时执行
      */
-    @Scheduled(initialDelay = 10000,fixedRate = 1000)
-    public void executor2(){
-        LOGGER.debug("executor2");
-    }
+//    @Scheduled(initialDelay = 10000,fixedRate = 1000)
+//    public void executor2(){
+//        LOGGER.debug("executor2");
+//    }
 
 }
